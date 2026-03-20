@@ -1,31 +1,28 @@
-// Add this at the top of your script.js or inside DOMContentLoaded
-const marketToggle = document.getElementById('market-toggle');
-const marketLabel = document.getElementById('market-label');
+const marketToggle = document.getElementById("market-toggle");
+const marketLabel = document.getElementById("market-label");
 
-marketToggle.addEventListener('change', () => {
-    marketLabel.innerText = marketToggle.checked ? "UK (London)" : "US (Global)";
-    marketLabel.classList.toggle('text-blue-400', marketToggle.checked);
-});
+if (marketToggle && marketLabel) {
+    marketToggle.addEventListener("change", () => {
+        marketLabel.innerText = marketToggle.checked ? "UK (London)" : "US (Global)";
+        marketLabel.classList.toggle("text-blue-400", marketToggle.checked);
+    });
+}
 
-function addTicker() {
-    const input = document.getElementById('ticker-search');
-    let newTicker = input.value.toUpperCase().trim();
-    if (!newTicker) return;
+function normalizeTicker(value) {
+    let ticker = value.toUpperCase().trim().replace(/\s+/g, "");
+    if (!ticker) return "";
 
-    // Logic for UK Market Toggle
-    if (marketToggle.checked && !newTicker.endsWith('.L')) {
-        newTicker += '.L';
+    // Support common free-text entry for London Stock Exchange.
+    const lseAliases = new Set(["LONDONLSE", "LSE", "LONDONSTOCKEXCHANGE", "LSEGROUP"]);
+    if (lseAliases.has(ticker)) {
+        return "LSEG.L";
     }
 
-    let current = getCookie("my_stocks");
-    let stocks = current ? current.split(',') : [];
-    
-    if (!stocks.includes(newTicker)) {
-        stocks.push(newTicker);
-        setCookie("my_stocks", stocks.join(','));
-        fetchData(); 
+    if (marketToggle && marketToggle.checked && !ticker.endsWith(".L")) {
+        ticker += ".L";
     }
-    input.value = '';
+
+    return ticker;
 }
 // --- COOKIE HELPERS ---
 function setCookie(name, value, days = 7) {
@@ -56,7 +53,7 @@ async function fetchData() {
     try {
         // Send the custom tickers to our Python API via a "query string"
         // e.g., /api?extra=NFLX,META
-        const response = await fetch(`/api?extra=${customTickers}`);
+        const response = await fetch(`/api?extra=${encodeURIComponent(customTickers || "")}`);
         const data = await response.json();
         
         loadingState.classList.add('hidden');
@@ -79,19 +76,19 @@ async function fetchData() {
 }
 
 function addTicker() {
-    const input = document.getElementById('ticker-search');
-    const newTicker = input.value.toUpperCase().trim();
+    const input = document.getElementById("ticker-search");
+    const newTicker = normalizeTicker(input.value);
     if (!newTicker) return;
 
-    let current = getCookie("my_stocks");
-    let stocks = current ? current.split(',') : [];
+    const current = getCookie("my_stocks");
+    const stocks = current ? current.split(",") : [];
     
     if (!stocks.includes(newTicker)) {
         stocks.push(newTicker);
-        setCookie("my_stocks", stocks.join(','));
+        setCookie("my_stocks", stocks.join(","));
         fetchData(); // Refresh list with new ticker
     }
-    input.value = '';
+    input.value = "";
 }
 
 function clearCustomTickers() {

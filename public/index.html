@@ -20,6 +20,17 @@
             <div id="last-updated" class="text-xs text-gray-500 italic mb-1">Last checked: Never</div>
         </div>
 
+        <div class="mt-6 flex gap-2">
+            <input type="text" id="ticker-search" placeholder="Add Ticker (e.g. NFLX)" 
+                   class="bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-green-500 flex-grow">
+            <button onclick="addTicker()" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg font-bold transition">
+                Add
+            </button>
+            <button onclick="clearCustomTickers()" class="bg-red-900/30 text-red-400 hover:bg-red-900/50 px-4 py-2 rounded-lg text-sm">
+                Clear
+            </button>
+        </div>
+
         <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700">
             <table class="w-full text-left border-collapse">
                 <thead>

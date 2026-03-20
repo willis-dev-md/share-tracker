@@ -1,3 +1,32 @@
+// Add this at the top of your script.js or inside DOMContentLoaded
+const marketToggle = document.getElementById('market-toggle');
+const marketLabel = document.getElementById('market-label');
+
+marketToggle.addEventListener('change', () => {
+    marketLabel.innerText = marketToggle.checked ? "UK (London)" : "US (Global)";
+    marketLabel.classList.toggle('text-blue-400', marketToggle.checked);
+});
+
+function addTicker() {
+    const input = document.getElementById('ticker-search');
+    let newTicker = input.value.toUpperCase().trim();
+    if (!newTicker) return;
+
+    // Logic for UK Market Toggle
+    if (marketToggle.checked && !newTicker.endsWith('.L')) {
+        newTicker += '.L';
+    }
+
+    let current = getCookie("my_stocks");
+    let stocks = current ? current.split(',') : [];
+    
+    if (!stocks.includes(newTicker)) {
+        stocks.push(newTicker);
+        setCookie("my_stocks", stocks.join(','));
+        fetchData(); 
+    }
+    input.value = '';
+}
 // --- COOKIE HELPERS ---
 function setCookie(name, value, days = 7) {
     const date = new Date();
